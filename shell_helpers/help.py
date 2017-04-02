@@ -11,5 +11,5 @@ You can run the following shell commands:
 
 ==== Debugging ====
 * `pref_log` - Log out the current prefs for the session
-* `dowse_what` - Log out the piece of artwork we're seeking
+* `dowse_target` - Log out the piece of artwork we're seeking
 """

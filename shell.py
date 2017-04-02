@@ -20,7 +20,26 @@ def cli_app():
 
 @cli_app.command()
 def dowse():
-    print 'the_command is running'
+    print 'Let\'s find some artwork you might like, based on your prefs:'
+    prefs = emulator.get_local_prefs()
+    print "Logging %s total pref(s)" % len(prefs)
+    for item_key, p in prefs.items():
+        print "* %s: %s" % (item_key, unicode(p))
+
+    assoc_rules = emulator.get_assoc_rules()
+    print "Logging association rules:"
+    for rule_key, rule in assoc_rules.items():
+        print "* %s:%s" % (rule_key, rule)
+
+    print ""
+    print ""
+
+    target_rule = emulator.get_new_target()
+
+    print "New target found:"
+    print "We think you will like %s (%s confidence)" % (target_rule[1], target_rule[2])
+    print "This is based on rule:"
+    print target_rule
 
 
 @cli_app.command()
@@ -71,13 +90,40 @@ def help():
 
 
 @cli_app.command()
-def dowse_what():
+def dowse_target():
     target_item_id = emulator.get_target_id()
     if not target_item_id:
         print "There is currently not a target, type `dowse` to determine a target artwork."
         return
     print "You are currently trying to find artwork with item_id: %s" % target_item_id
     print "Type `dowse` again to seek a differnt piece."
+
+
+@cli_app.command()
+def scan_target():
+    """
+    Emulate the user scanning the RFID on the artwork
+    """
+    target_item_id = emulator.get_target_id()
+
+    if not target_item_id:
+        print "There is currently not a target, type `dowse` to determine a target artwork."
+        return
+
+    print "Item Id: %s " % target_item_id
+
+    # Ask if they like it or not
+    pref = click.prompt('Do you like this? Type `y` or `n`', type=str)
+    if pref.lower() == 'y':
+        pref = True
+    else:
+        pref = False
+
+    emulator.record_preference(target_item_id, pref)
+
+    print ""
+    print "Great! Type `dowse` to find another artwork in the galleries."
+
 
 if __name__ == '__main__':
     cli_app()

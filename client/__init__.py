@@ -10,7 +10,12 @@ METHOD_PUT = 'PUT'
 METHOD_DELETE = 'DELETE'
 
 
+# TODO: Record timestamp - convert to REST-friendly timestamp
 def record_preference(user_id, item_id, pref, timestamp):
+    """
+    Notify the pref service of a new preference
+    """
+
     data = [{
         'item_id': item_id,
         'pref': pref,
