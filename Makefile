@@ -14,4 +14,4 @@ install:
 	@echo "Yay! Everything installed."
 
 run:
-	python main.py
+	python shell.py

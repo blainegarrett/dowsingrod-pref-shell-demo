@@ -2,12 +2,24 @@ import click
 from click_shell import shell
 
 from shell_helpers.intro import intro_header
-from shell_helpers.help import help_message
+from shell_helpers.help import help_message, host_help
 import emulator
 
 
 @shell(prompt='pref-client-cli > ')
-def cli_app():
+@click.option('--host', default=None, help=host_help)
+def cli_app(host):
+    # Setup Host
+    if (not host):
+        print ""
+        print "ERROR: argument --host is required."
+        print "PrefService Host: e.g. http://127.0.0.1:9090 or http://pref-service-dev.appspot.com"
+        print ""
+        exit()
+    emulator.set_pref_service_host(host)
+
+    # Display Intro
+    print host
     print intro_header
     print "* Starting command line tool"
     print "* Pref service api host: %s" % emulator.get_pref_service_host()
@@ -15,31 +27,34 @@ def cli_app():
     print "* Session ID is %s" % emulator.get_session_id()
     print ""
     print "Type `help` to see a list of available commands"
-    print "Type `kiosk` to emulate prefing art at the kiosk or `dowse` to determine a target."
+    print "Type `kiosk` to emulate prefing art at the kiosk"
+    print "Type `free_scan` to emulate prefing random pieces of artwork."
+    print "Type `dowse` to determine a target from assoc rules."
 
 
 @cli_app.command()
 def dowse():
-    print 'Let\'s find some artwork you might like, based on your prefs:'
-    prefs = emulator.get_local_prefs()
-    print "Logging %s total pref(s)" % len(prefs)
-    for item_key, p in prefs.items():
-        print "* %s: %s" % (item_key, unicode(p))
-
-    assoc_rules = emulator.get_assoc_rules()
-    print "Logging association rules:"
-    for rule_key, rule in assoc_rules.items():
-        print "* %s:%s" % (rule_key, rule)
-
-    print ""
-    print ""
-
+    print 'Let\'s find some artwork you might like, based on your prefs...'
+    # prefs = emulator.get_local_prefs()
+    # assoc_rules = emulator.get_assoc_rules()
     target_rule = emulator.get_new_target()
 
-    print "New target found:"
-    print "We think you will like %s (%s confidence)" % (target_rule[1], target_rule[2])
+    print ""
+    # If we couldn't get a target... log it out
+    if not target_rule:
+        print 'We couldn\'t determine a target. Do you have prefs?'
+        print 'Type `prefs_log` to see your pref'
+        print 'Type `rules_log` to generated system rules'
+        return
+
+    print "We found something for you you have not seen yet!"
+    print ""
+    print "We think you will like %s (%s confidence)" % (target_rule[1][0], target_rule[2])
     print "This is based on rule:"
     print target_rule
+    print ""
+    print "Type `scan_target` to set pref on this artwork"
+    print "    or type `dowse_target` to remind you what you are looking for."
 
 
 @cli_app.command()
@@ -82,6 +97,18 @@ def prefs_log():
 
 
 @cli_app.command()
+def rules_log():
+    """
+    Log out the recommendation rules stored on device
+    """
+
+    rules = emulator.get_assoc_rules()
+    print "Logging %s total recommendation(s)" % len(rules)
+    for rule_key, r in rules.items():
+        print "* %s: %s" % (rule_key, unicode(r))
+
+
+@cli_app.command()
 def help():
     """
     Display Available Commands
@@ -96,7 +123,7 @@ def dowse_target():
         print "There is currently not a target, type `dowse` to determine a target artwork."
         return
     print "You are currently trying to find artwork with item_id: %s" % target_item_id
-    print "Type `dowse` again to seek a differnt piece."
+    print "Type `dowse` again to seek a differnt piece or `scan_target` to set pref."
 
 
 @cli_app.command()
@@ -119,11 +146,55 @@ def scan_target():
     else:
         pref = False
 
+    emulator.reset_target_id()
     emulator.record_preference(target_item_id, pref)
 
     print ""
     print "Great! Type `dowse` to find another artwork in the galleries."
 
 
+@cli_app.command()
+def free_scan():
+    """
+    Emulate the user scanning a non target item
+    """
+    print "Did you stop and see something you loved or hated?"
+    print ""
+    item_id = click.prompt('Enter item_id (this can be anything)', type=str)
+    pref = click.prompt('Do you like it? Type `y` or `n`', type=str)
+    if pref.lower() == 'y':
+        pref = True
+    else:
+        pref = False
+    emulator.record_preference(item_id, pref)
+
+    print ""
+    print "Great! Type `dowse_target` to remind you where you were headed."
+
+
+@cli_app.command()
+def cron():
+    """
+    Run the cron operation to regnerate rules based on current prefs
+    """
+    print "Do you want to run the cron job to regenerate the association rules?"
+    print "Note: This may take a bit and time out on the client but will finish in the background."
+
+    pref = click.prompt('Do you generate a new ruleset? Type `y` or `n`', type=str)
+    if not pref.lower() == 'y':
+        print "Cancelling. Continuing to use current ruleset."
+        return
+
+    min_confidence = click.prompt('Enter min confidence (decimal between 0 and 1)', type=str)
+    min_support = click.prompt('Enter min support (decimal between 0 and 1)', type=str)
+
+    print ""
+
+    emulator.generate_new_ruleset(min_confidence, min_support)
+    x = (min_confidence, min_support)
+    print "Generating new ruleset with min confidence %s and min support %s" % x
+
+
 if __name__ == '__main__':
+    # Run Shell - note args are parsed by click_shell
     cli_app()
