@@ -53,6 +53,8 @@ class URLOpener:
                 request += 'Content-Length: %s\r\n\r\n%s\r\n' % (len(enc_data), enc_data)
             else:
                 request += 'Content-Length: %s\r\n\r\n%s\r\n' % (len(data), data)
+        else: # POST REQUESTS NEED CONTENT LENGTH ERROR
+                request += 'Content-Length: %s\r\n\r\n%s\r\n' % (len(data), data)
         request += '\r\n'
         s.send(request)
 
