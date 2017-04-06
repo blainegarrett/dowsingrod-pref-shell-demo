@@ -63,9 +63,17 @@ def record_preferences(user_id, prefs_array):
     return json_resp['results']
 
 
+def get_rules():
+    """
+    Fetch a set of recommendations (assoc rules) from latest rule set
+    """
+    json_resp = do_request('/api/rest/v1.0/recommendations', METHOD_GET)
+    return json_resp['results']  # A list of recommendations (assoc rules)
+
+
 def get_rules_for_user(user_id):
     """
-    Fetch a set of recommendations (assoc rules) for the given user
+    Fetch a set of recommendations (assoc rules) from latest rule set for the given user
     """
 
     json_resp = do_request('/api/rest/v1.0/recommendations/%s' % user_id, METHOD_GET)

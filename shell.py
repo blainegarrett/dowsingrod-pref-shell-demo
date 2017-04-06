@@ -33,6 +33,16 @@ def cli_app(host):
 
 
 @cli_app.command()
+def get_rulesets():
+    "Getting all association rules for the latest rule set"
+    # TODO Prompt for min_confidence
+
+    emulator.get_base_ruleset()
+
+    print "Done. Type `rules_log` to see the rules"
+
+
+@cli_app.command()
 def dowse():
     print 'Let\'s find some artwork you might like, based on your prefs...'
     # prefs = emulator.get_local_prefs()
@@ -105,8 +115,8 @@ def rules_log():
 
     rules = emulator.get_assoc_rules()
     print "Logging %s total recommendation(s)" % len(rules)
-    for rule_key, r in rules.items():
-        print "* %s: %s" % (rule_key, unicode(r))
+    for r in rules:
+        print "* %s" % unicode(r)
 
 
 @cli_app.command()

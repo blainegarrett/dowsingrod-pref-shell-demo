@@ -23,6 +23,7 @@ You can run the following shell commands:
 
 ==== Admin ====
 * `cron` - Trigger generation of new association rules and clear out device rules
+* `get_rulesets` - Populate device association rules with all the rules for the latest set
 
 """
 

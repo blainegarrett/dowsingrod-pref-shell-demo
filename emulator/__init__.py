@@ -17,8 +17,9 @@ DEVICE_ID = '612'
 SESSION_ID = None
 PREF_API_HOST = 'http://127.0.0.1:9090'
 LOCAL_PREFS = {}  # Dict with keys being item_ids
-SERVICE_ASSOC_RULES = {}  # Association Rules coming from the service
+SERVICE_ASSOC_RULES = []  # Association Rules coming from the service
 TARGET_ITEM_ID = None   # Current target based on rules
+
 
 DEFAULT_ASSOC_RULES = {  # Where to send people if we have no better idea or service is down
     'olmec_mask:0': (('olmec_mask:0'), 'chuck:1', .5),
@@ -156,7 +157,8 @@ def get_rule_where_target_not_seen(rules):
     not already set a preference on.
     """
 
-    for rule_key, candidate_rule in rules.items():
+    for candidate_rule in rules:
+        # rule_key = candidate_rule[3]
         candidate_item_id = candidate_rule[1][0].split(':')[0]  # Note: consequent is a list...
 
         # print "Candidate target id %s " % candidate_item_id
@@ -198,6 +200,21 @@ def get_new_target():
     return rule
 
 
+def get_base_ruleset():
+    """
+    Call out to service and get all rules for the latest rule set
+    """
+    global SERVICE_ASSOC_RULES
+
+    rules = client.get_rules()
+    SERVICE_ASSOC_RULES = []
+    for rule in rules:
+        SERVICE_ASSOC_RULES.append((rule['ant'],
+                                    rule['con'],
+                                    rule['confidence'],
+                                    rule['rule_key']))
+
+
 def populate_rules_from_service():
     """
     Call out to service and get a set of rules for the context user
@@ -208,7 +225,10 @@ def populate_rules_from_service():
 
     rules = client.get_rules_for_user(get_session_id())
     for rule in rules:
-        SERVICE_ASSOC_RULES[rule['rule_key']] = (rule['ant'], rule['con'], rule['confidence'])
+        SERVICE_ASSOC_RULES.append((rule['ant'],
+                                    rule['con'],
+                                    rule['confidence'],
+                                    rule['rule_key']))
 
 
 def get_assoc_rules():
@@ -260,4 +280,4 @@ def generate_new_ruleset(min_confidence, min_support):
 
     client.generate_new_ruleset(min_confidence, min_support)
     global SERVICE_ASSOC_RULES
-    SERVICE_ASSOC_RULES = {}  # flush ruleset
+    SERVICE_ASSOC_RULES = []  # flush ruleset
