@@ -94,7 +94,7 @@ def set_local_pref(item_id, pref, timestamp, sync_timestamp=None):
     return True
 
 
-def record_preference(item_id, pref):
+def record_preference(item_id, pref, sync=True):
     """
     Attempt to record a preference
     """
@@ -105,11 +105,33 @@ def record_preference(item_id, pref):
 
     # Attempt to update service and get a rest resource back
     # TODO: Handle error(?)
+
+    if not sync:
+        return True
+
+    # Sync the preference to the pref service
     r = client.record_preference(get_session_id(), item_id, pref, timestamp)
 
     # Overwrite the local store with sync timestamp
     if (r):
         set_local_pref(r['item_id'], r['pref'], r['timestamp'], r['synced_timestamp'])
+    return True
+
+
+def record_preferences():
+    """
+    Attempt to sync all of the preferences on the device with the prefs service
+    Note: We assume these were stored on device through record_preference
+        and may or may not have been synced already
+    """
+
+    prefs = get_local_prefs()  # Sync'd or not
+    updated_prefs = client.record_preferences(get_session_id(), prefs.values())
+
+    for r in updated_prefs:
+        set_local_pref(r['item_id'], r['pref'], r['timestamp'], r['synced_timestamp'])
+
+    # TODO: Audit the recording - total? etc
     return True
 
 

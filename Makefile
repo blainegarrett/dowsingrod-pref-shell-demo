@@ -12,6 +12,3 @@ clean:
 install:
 	pip install -Ur requirements.txt
 	@echo "Yay! Everything installed."
-
-run:
-	python shell.py

@@ -5,10 +5,15 @@ You can run the following shell commands:
 * `quit()` - exit the cli tools
 
 ==== Events ====
-* `kiosk` - Display a random piece of artwork to set pref on to seed prefs
+* `kiosk` - Display a random piece of artwork to set pref on to seed prefs (--do_sync=False to emulate wifi being down)
 * `dowse` - Deterime a piece of artwork to seek out based on prefs and rules
-* `scan_target` - Display current piece of artwork and set preference
-* `free_scan` - Arbitrarily pref a piece of arwork. Emulates user scanning random pieces.
+
+
+==== Device Actions ===
+* `scan_target` - Display current piece of artwork and set preference (--do_sync=False to emulate wifi being down)
+* `free_scan` - Arbitrarily pref a piece of arwork. Emulates user scanning random pieces. (--do_sync=False to emulate wifi being down)
+* `send_visited_works` - Emulate firmware call sendVisitedWorks to sync prefs that have not yet been sync'd
+
 
 ==== Debugging ====
 * `pref_log` - Log out the current prefs for the session

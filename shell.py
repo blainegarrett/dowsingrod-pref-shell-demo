@@ -57,8 +57,9 @@ def dowse():
     print "    or type `dowse_target` to remind you what you are looking for."
 
 
+@click.option('--do_sync', default=True, help='Debug - wifi on or not', type=bool)
 @cli_app.command()
-def kiosk():
+def kiosk(do_sync):
     kiosk_choice = emulator.get_random_kiosk_artwork()
 
     if (not kiosk_choice):
@@ -78,7 +79,7 @@ def kiosk():
     else:
         pref = False
 
-    emulator.record_preference(kiosk_choice.id, pref)
+    emulator.record_preference(kiosk_choice.id, pref, do_sync)
 
     print ""
     print "Great! Type `kiosk` again or `dowse` to find artwork in the galleries."
@@ -126,8 +127,9 @@ def dowse_target():
     print "Type `dowse` again to seek a differnt piece or `scan_target` to set pref."
 
 
+@click.option('--do_sync', default=True, help='Debug - wifi on or not', type=bool)
 @cli_app.command()
-def scan_target():
+def scan_target(do_sync):
     """
     Emulate the user scanning the RFID on the artwork
     """
@@ -147,14 +149,15 @@ def scan_target():
         pref = False
 
     emulator.reset_target_id()
-    emulator.record_preference(target_item_id, pref)
+    emulator.record_preference(target_item_id, pref, do_sync)
 
     print ""
     print "Great! Type `dowse` to find another artwork in the galleries."
 
 
+@click.option('--do_sync', default=True, help='Debug - wifi on or not', type=bool)
 @cli_app.command()
-def free_scan():
+def free_scan(do_sync):
     """
     Emulate the user scanning a non target item
     """
@@ -166,10 +169,21 @@ def free_scan():
         pref = True
     else:
         pref = False
-    emulator.record_preference(item_id, pref)
+
+    emulator.record_preference(item_id, pref, do_sync)
 
     print ""
     print "Great! Type `dowse_target` to remind you where you were headed."
+
+
+@cli_app.command()
+def send_visited_works():
+    """
+    Emulate firmware call sendVisitedWorks to sync prefs that have not yet been sync'd
+    """
+    print "Device Returned to Cradle. Lets sync any preferences not yet synced."
+
+    emulator.record_preferences()
 
 
 @cli_app.command()
