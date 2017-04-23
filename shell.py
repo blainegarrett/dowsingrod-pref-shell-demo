@@ -1,3 +1,10 @@
+"""
+Dowsing Rod Demo Interactive Shell
+
+This emulates the Kisok and Firmware Actions + debugging helpers
+
+"""
+
 import click
 from click_shell import shell
 
@@ -21,13 +28,13 @@ def cli_app(host):
     # Display Intro
     print host
     print intro_header
-    print "* Starting command line tool"
+    print "* Starting interactive shell"
     print "* Pref service api host: %s" % emulator.get_pref_service_host()
     print "* Device ID is %s" % emulator.get_device_id()
     print "* Session ID is %s" % emulator.get_session_id()
     print ""
     print "Type `help` to see a list of available commands"
-    print "Type `kiosk` to emulate prefing art at the kiosk"
+    print "Type `kiosk` to emulate prefing art at the kiosk (scan kiosk RFID)"
     print "Type `free_scan` to emulate prefing random pieces of artwork."
     print "Type `dowse` to determine a target from assoc rules."
 
@@ -191,9 +198,12 @@ def send_visited_works():
     """
     Emulate firmware call sendVisitedWorks to sync prefs that have not yet been sync'd
     """
-    print "Device Returned to Cradle. Lets sync any preferences not yet synced."
+    print "Device Returned to Cradle. Let's sync any preferences not yet synced."
 
+    # Note: According to the DivRodHLOflow diagram this will be done via the EC2 layer?
     emulator.record_preferences()
+
+    print "Preferences Sync'd. Have a nice day."
 
 
 @cli_app.command()
