@@ -1,5 +1,5 @@
 # Dowsing Rod Pref Service Shell Demo
-This is an end-to-end demo of interacting with the Dowsing Rod Preference Engine
+This is an end-to-end demo of interacting with the Divining Rod Preference Engine
 
 
 Installation of Demo
