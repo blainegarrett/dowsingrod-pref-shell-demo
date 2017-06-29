@@ -1,4 +1,4 @@
-# Dowsing Rod Pref Service Shell Demo
+# Divining Rod Pref Service Shell Demo
 This is an end-to-end demo of interacting with the [Divining Rod Preference Service](https://github.com/divrods/pref_service).
 It is an interactive python shell meant to be installed locally.
 
