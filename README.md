@@ -1,5 +1,8 @@
 # Dowsing Rod Pref Service Shell Demo
 This is an end-to-end demo of interacting with the [Divining Rod Preference Service](https://github.com/divrods/pref_service).
+It is an interactive python shell meant to be installed locally.
+
+**Note:This shell is based on early and obsolete assumptions about the implementation of the device capabilities, firmware, and utility service. Do not study this as a means to understand the current design.**
 
 
 Installation of Demo
@@ -13,6 +16,7 @@ into ~/projects/divrods/pref-shell-demo/ or your preferred directory
 
 #### Install Dependencies
 Setup Virtual Env so we don't clutter global python dependencies
+
 `cd ~/projects/divrods/pref-shell-demo/`
 
 `mkvirtualenv divrods-pref-shell-demo -a .`
@@ -22,6 +26,7 @@ Setup Virtual Env so we don't clutter global python dependencies
 
 Run demo
 --------------
+Be sure to activate your virtual environment if it is not via `workon divrods-pref-shell-demo`
 To run the demo, type: `python shell.py --host=<pref_api_host>`
 
 If you are running the service locally, `pref_api_host` will be something like `--host=http://127.0.0.1:9090`
